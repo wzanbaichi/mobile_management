@@ -13,11 +13,14 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "element-ui": "^2.3.9",
+    "node-rsa": "^1.0.0",
     "postcss": "^6.0.22",
     "postcss-import": "^11.1.0",
     "postcss-px2rem": "^0.3.0",
     "px2rem-loader": "^0.1.9",
+    "qs": "^6.5.2",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },
