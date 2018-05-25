@@ -59,7 +59,7 @@
                     </div>
                 </div>
             </div>
-            <div>
+            <div class="bottomContent">
                 <div class="infoContent">
                     <span><i>*</i>请留下您的宝贵建议</span>
                     <textarea v-model="infoParam.content" rows="3" class="adviceArea"></textarea>
@@ -332,6 +332,11 @@ export default {
 <style>
 body {
     background-color: #F1F1F1;
+}
+.bottomContent {
+    height: 100%;
+    position: fixed;
+    background-color: #ffffff;
 }
 .infoIndex {
     background-color: #ffffff;
