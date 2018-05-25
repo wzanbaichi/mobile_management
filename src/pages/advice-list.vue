@@ -56,10 +56,10 @@ export default {
         return {
             title:'建议列表',
             activeName: '',
-            timestamp: new Date().getTime(),
             listParam: {
                 itvId: 'zuoying9241',
-                typeId: ''
+                typeId: '',
+                timestamp: new Date().getTime()
             },
             indexArray: [
                 {
@@ -92,7 +92,7 @@ export default {
     },
     methods: {
         getListData() {
-            let timestamp = Encrypt.encryptStr('timestamp=' + this.timestamp);
+            let timestamp = Encrypt.encryptStr('timestamp=' + this.listParam.timestamp);
             axios.get(this.urlHeader + '/proposal/getProposalList',{params:this.listParam,headers:{
                 "Authorization": timestamp
             }})

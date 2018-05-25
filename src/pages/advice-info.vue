@@ -33,14 +33,11 @@
                 <span><i>*</i>您为我们提供一下哪些建议呢？</span>
                 <div @click="handleType">
                     <el-row>
-                        <el-col v-for="item in typeArray" :key="item.id" :span="8">
-                            <el-button class="typeButton">{{item.name}}</el-button>
-                        </el-col>
-                        <!-- <el-col :span="8">
-                            <div @click="isUI = !isUI">
-                                <el-tag :class="!isUI ? 'defaultTag' : 'activeTag'">UI界面</el-tag>
+                        <el-col v-for="(item, index) in typeArray" :key="item.id" :span="8">
+                            <div @click="selectType(index)">
+                                <el-tag :class="item.typeClass">{{item.name}}</el-tag>
                             </div>
-                        </el-col> -->
+                        </el-col>
                     </el-row>
                 </div>
             </div>
@@ -50,11 +47,10 @@
                     <span>您的手机号码可能是：</span>
                     <div @click="handleClick">
                         <el-row >
-                            <el-col v-for="item in mobiles" :key="item.id" :span="8">
-                                <el-button class="mobileButton">{{item}}</el-button>
-                                <!-- <div @click="item.active = !item.active" @blur="test()">
-                                    <el-tag :class="!item.active ? 'defaultTag' : 'activeTag'">{{item.number}}</el-tag>
-                                </div> -->
+                            <el-col v-for="(item, index) in mobiles" :key="index" :span="8">
+                                <div @click="selectMobile(index)">
+                                    <el-tag :class="item.mobileClass">{{item.number}}</el-tag>
+                                </div>
                             </el-col>
                         </el-row>
                     </div>
@@ -112,15 +108,17 @@ import head from '../components/header.vue'
 import Encrypt from '../assets/js/encrypt'
 import axios from 'axios'
 import qs from 'qs'
+import Vue from 'vue'
 export default {
     name: 'app',
     data(){
         return {
             title: '优化建议',
             typeArray: [],
-            timestamp: new Date().getTime(),
+            formerType: undefined,
             baseInfo: {},
             mobiles: [],
+            formerMobile: undefined,
             dialogMobile: false,
             isDisabled: false,
             codeButton: '获取验证码',
@@ -128,6 +126,7 @@ export default {
             urlHeader: '',
             infoParam: {
                 itvId: 'zuoying9241',
+                timestamp: new Date().getTime(),
                 mobile: '',
                 content: '',
                 classifyId: ''
@@ -147,17 +146,58 @@ export default {
         this.getType();
     },
     methods: {
+        selectType(index) {
+            if(this.typeArray[index].typeClass === 'defaultTag') {
+                console.log(this.formerType)
+                console.log(index)
+                if(this.formerType >= 0 && this.formerType != index) {
+                    console.log(index)
+                    this.typeArray[this.formerType].typeClass = 'defaultTag';
+                    Vue.set(this.typeArray,this.formerType,this.typeArray[this.formerType])
+                }
+                this.typeArray[index].typeClass = 'activeTag';
+                this.formerType = index;
+                Vue.set(this.typeArray,index,this.typeArray[index]);
+                return;
+            }
+            if(this.typeArray[index].typeClass === 'activeTag') {
+                this.typeArray[index].typeClass = 'defaultTag';
+                Vue.set(this.typeArray,index,this.typeArray[index]);
+                return;
+            }
+        },
+        selectMobile(index) {
+            if(this.mobiles[index].mobileClass === 'defaultTag') {
+                if(this.formerMobile >= 0 && this.formerMobile != index) {
+                    this.mobiles[this.formerMobile].mobileClass = 'defaultTag';
+                    Vue.set(this.mobiles,this.formerMobile,this.mobiles[this.formerMobile])
+                }
+                this.mobiles[index].mobileClass = 'activeTag';
+                this.formerMobile = index;
+                Vue.set(this.mobiles,index,this.mobiles[index])
+                return;
+            }
+            if(this.mobiles[index].mobileClass === 'activeTag') {
+                this.mobiles[index].mobileClass = 'defaultTag';
+                Vue.set(this.mobiles,index,this.mobiles[index])
+                return;
+            }
+        },
         getInfo() {
-            let timestamp = Encrypt.encryptStr('timestamp=' + this.timestamp);
+            let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
             axios.get(this.urlHeader + '/home/getUserInfo',{params:this.infoParam,headers:{
                 "Authorization": timestamp
             }})
             .then(response=> {
                 let result = JSON.parse(response.data.data);
+                
                 this.baseInfo = result;
                 for(let key in JSON.parse(result.activityPhone)) {
                     if(JSON.parse(result.activityPhone).hasOwnProperty(key)) {
-                        this.mobiles.push(key);
+                        let mobileItem = {};
+                        mobileItem.number = key;
+                        mobileItem.mobileClass = 'defaultTag';
+                        this.mobiles.push(mobileItem);
                     }
                 }
             })
@@ -165,12 +205,15 @@ export default {
             });
         },
         getType() {
-            let timestamp = Encrypt.encryptStr('timestamp=' + this.timestamp);
-            axios.get(this.urlHeader + '/proposal/getProposalTypes',{headers:{
+            let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
+            axios.get(this.urlHeader + '/proposal/getProposalTypes',{params:{timestamp:this.infoParam.timestamp},headers:{
                 "Authorization": timestamp
             }})
             .then(response=> {
                 this.typeArray = response.data.data;
+                for(let i=0; i<this.typeArray.length; i++) {
+                    this.typeArray[i].typeClass = 'defaultTag'
+                }
             })
             .catch(response=> {
             });
@@ -198,7 +241,7 @@ export default {
                 return false;
             }
             if(this.infoParam.mobile && this.infoParam.classifyId && this.infoParam.content) {
-                let timestamp = Encrypt.encryptStr('timestamp=' + this.timestamp);
+                let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
                 axios.post(this.urlHeader + '/proposal/collect',qs.stringify(this.infoParam),{
                     headers:{
                         "Authorization": timestamp
@@ -231,14 +274,14 @@ export default {
             if(this.newCode && this.newCode === this.currentCode) {
                 this.dialogMobile = false;
                 this.warningCode = '';
-                this.mobiles.push(this.newMobile);
+                this.mobiles.push({number:this.newMobile, mobileClass: 'defaultTag'});
             }
         },
         getCode() {
             if(this.newMobile) {
                 this.setTime();
-                let timestamp = Encrypt.encryptStr('timestamp=' + this.timestamp);
-                axios.post(this.urlHeader + '/message/sendMsg',qs.stringify({mobile:this.newMobile}),{
+                let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
+                axios.post(this.urlHeader + '/message/sendMsg',qs.stringify({mobile:this.newMobile,timestamp:this.infoParam.timestamp}),{
                     headers:{
                         "Authorization": timestamp
                     }
