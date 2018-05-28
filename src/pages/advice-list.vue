@@ -81,7 +81,7 @@ export default {
             ],
             contentArray: [],
             isCollapsed: false,
-            urlHeader: ''
+            urlHeader: 'interactive'
         }
     },
     components:{

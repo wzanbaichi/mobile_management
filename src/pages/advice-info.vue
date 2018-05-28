@@ -34,9 +34,9 @@
                 <div @click="handleType">
                     <el-row>
                         <el-col v-for="(item, index) in typeArray" :key="item.id" :span="8">
-                            <div @click="selectType(index)">
-                                <el-tag :class="item.typeClass">{{item.name}}</el-tag>
-                            </div>
+                            <span @click="selectType(index)">
+                                <el-tag :class="item.typeClass"  @click="selectType(index)">{{item.name}}</el-tag>
+                            </span>
                         </el-col>
                     </el-row>
                 </div>
@@ -48,21 +48,21 @@
                     <div @click="handleClick">
                         <el-row >
                             <el-col v-for="(item, index) in mobiles" :key="index" :span="8">
-                                <div @click="selectMobile(index)">
+                                <span @click="selectMobile(index)">
                                     <el-tag :class="item.mobileClass">{{item.number}}</el-tag>
-                                </div>
+                                </span>
                             </el-col>
                         </el-row>
                     </div>
-                    <div @click="dialogMobile = true">
+                    <span @click="dialogMobile = true">
                         <el-tag class="defaultTag">以上号码都不是，点击添加</el-tag>
-                    </div>
+                    </span>
                 </div>
             </div>
             <div class="bottomContent">
                 <div class="infoContent">
-                    <span><i>*</i>请留下您的宝贵建议</span>
-                    <textarea v-model="infoParam.content" rows="3" class="adviceArea"></textarea>
+                <span><i>*</i>请留下您的宝贵建议</span>
+                <textarea v-model="infoParam.content" rows="3" class="adviceArea"></textarea>
                 </div>
                 <div  class="applyButton">
                     <el-button type="primary" @click="apply">提交</el-button>
@@ -123,7 +123,7 @@ export default {
             isDisabled: false,
             codeButton: '获取验证码',
             countDown: 60,
-            urlHeader: '',
+            urlHeader: 'interactive',
             infoParam: {
                 itvId: 'zuoying9241',
                 timestamp: new Date().getTime(),
@@ -336,7 +336,6 @@ body {
 .bottomContent {
     height: 100%;
     width: 100%;
-    position: fixed;
     background-color: #ffffff;
 }
 .infoIndex {
@@ -387,6 +386,7 @@ body {
 }
 .applyButton {
     text-align: center;
+    margin-bottom: 195px;
 }
 .applyButton button {
     width: 240px;
