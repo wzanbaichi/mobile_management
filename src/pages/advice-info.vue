@@ -249,10 +249,7 @@ export default {
                 })
                 .then(response=> {
                     if(response.data.message === '成功') {
-                        this.$message({
-                            message: '提交成功!',
-                            type: 'success'
-                        });
+                        this.$router.push({path:'/AdviceSuccess'});
                     }
                 })
                 .catch(response=> {
@@ -274,11 +271,24 @@ export default {
             if(this.newCode && this.newCode === this.currentCode) {
                 this.dialogMobile = false;
                 this.warningCode = '';
-                this.mobiles.push({number:this.newMobile, mobileClass: 'defaultTag'});
+                if(this.formerMobile >= 0) {
+                    this.mobiles[this.formerMobile].mobileClass = 'defaultTag';
+                    Vue.set(this.mobiles,this.formerMobile,this.mobiles[this.formerMobile])
+                }
+                this.formerMobile = this.mobiles.length;
+                this.infoParam.mobile = this.newMobile;
+                this.mobiles.push({number:this.newMobile, mobileClass: 'activeTag'});
             }
         },
         getCode() {
-            if(this.newMobile) {
+            let hasNumber = false;
+            for (var i=0; i<this.mobiles.length; i++) {
+                if(mobiles[i].number === this.newMobile) {
+                    hasNumber = true;
+                    break;
+                }
+            }
+            if(this.newMobile && !hasNumber) {
                 this.setTime();
                 let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
                 axios.post(this.urlHeader + '/message/sendMsg',qs.stringify({mobile:this.newMobile,timestamp:this.infoParam.timestamp}),{
@@ -316,7 +326,12 @@ export default {
             this.$router.push({path:'/AdviceList'});
         },
         handleClick(e) {
-            this.infoParam.mobile = e.target.innerText;
+            if(this.infoParam.mobile != e.target.innerText) {
+                this.infoParam.mobile = e.target.innerText;
+            }else {
+                this.infoParam.mobile = '';
+            }
+            
         },
         handleType(e) {
             for(let i=0; i<this.typeArray.length; i++) {
@@ -342,8 +357,8 @@ body {
     background-color: #ffffff;
 }
 .infoImg {
-    width: 120px;
-    height: 120px;
+    width: 60px;
+    height: 60px;
     border-radius: 100%;
     margin: 15px 0;
 }

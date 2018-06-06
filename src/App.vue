@@ -12,7 +12,7 @@ export default {
 </script>
 
 <style>
-@import url("//at.alicdn.com/t/font_675219_2mxxsiprs2k8d7vi.css");
+@import url("//at.alicdn.com/t/font_675219_cd43ri1grqqia4i.css");
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

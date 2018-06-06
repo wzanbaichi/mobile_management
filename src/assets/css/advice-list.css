@@ -1,0 +1,15 @@
+.el-tabs__header {
+    background-color: #ffffff;
+}
+.adviceContent div .el-tabs__header {
+    margin: 0;
+}
+.box-content {
+    text-align: center; 
+}
+.box-content div .el-card__body {
+    padding: 0;
+}
+.el-tabs__nav {
+    margin-left: 15%;
+}

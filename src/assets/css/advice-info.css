@@ -1,0 +1,11 @@
+.el-dialog {
+    width: 95%;
+}
+.defaultTag {
+    color: #000000;
+    background-color: #ffffff;
+}
+.activeTag {
+    color: #ffffff;
+    background-color: #1A9DE1;
+}

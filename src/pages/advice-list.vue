@@ -10,7 +10,7 @@
                         <el-card v-for="item in contentArray" :key="item.id" class="box-card">
                             <div class="itemIndex">
                                 <el-row>
-                                    <el-col class="indexDate" :span="12"><span >{{item.proposal.createDate}}</span></el-col>
+                                    <el-col class="indexDate" :span="12"><span class="indexName">{{item.classfyName}}</span></el-col>
                                     <el-col class="indexStatus" :span="12">
                                         <span v-if="item.reply" class="backItem"><i class="iconfont icon-pinglun3-copy"></i>已回复</span>
                                         <span v-if="!item.reply" class="applyItem"><i class="el-icon-success"></i>已提交</span>
@@ -19,15 +19,25 @@
                             </div>
                             <div>
                                 <div>
-                                    <div class="indexDate">
-                                    <span>{{item.proposal.createDate}}&nbsp;&nbsp;{{item.proposal.proposeName}}的反馈：</span>
-                                    </div>
+                                    <el-row>
+                                        <el-col class="indexDate" :span="12">
+                                            <span>您的反馈：</span>
+                                        </el-col>
+                                        <el-col class="indexStatus" :span="12">
+                                            <span>{{item.proposal.createDate}}</span>
+                                        </el-col>
+                                    </el-row>
                                     <div :class="!item.isCollapsed ? 'indexContent collapseContent':'indexContent uncollapseContent'">{{item.proposal.content}}</div>
                                 </div>
                                 <div v-if="item.reply">
-                                    <div class="indexDate"> 
-                                    <span>{{item.reply.replyDate}}&nbsp;&nbsp;{{item.reply.replyName}}的回复：</span>
-                                    </div>
+                                    <el-row>
+                                        <el-col class="indexDate" :span="12">
+                                            <span>客服回复：</span>
+                                        </el-col>
+                                        <el-col class="indexStatus" :span="12">
+                                            <span>{{item.reply.replyDate}}</span>
+                                        </el-col>
+                                    </el-row>
                                     <div :id="item.id" :class="!item.isCollapsed ? 'indexContent collapseContent':'indexContent uncollapseContent'">{{item.reply.replyContent}}</div>
                                 </div>
                             </div>
@@ -158,9 +168,12 @@ body {
 .indexDate span {
     margin-left: 30px;
 }
+.indexName {
+    line-height: 2.2;
+}
 .indexStatus {
     text-align: right;
-    line-height: 1.8;
+    line-height: 2.8;
 }
 .indexStatus span {
     margin-right: 30px;
@@ -199,7 +212,7 @@ body {
     color: #DDDDDD;
 }
 .el-tabs__nav {
-    margin-left: 18%;
+    margin-left: 15%;
 }
 .warningContent {
     margin-top: 150px;
