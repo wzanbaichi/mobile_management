@@ -97,7 +97,7 @@
 
             <div class="buttonGroup">
                 <el-button type="primary" @click="addMobile">确定</el-button>
-                <el-button type="info" @click="dialogMobile = false, warningCode = '', warningMobile = ''">取消</el-button>
+                <el-button type="info" @click="dialogMobile = false, warningCode = '', warningMobile = '', newMobile = '', countDown = 0, newCode = '', currentCode = ''">取消</el-button>
             </div>
         </el-dialog>
     </div>
@@ -125,7 +125,7 @@ export default {
             countDown: 60,
             urlHeader: 'interactive',
             infoParam: {
-                itvId: 'zuoying9241',
+                itvId: '',
                 timestamp: new Date().getTime(),
                 mobile: '',
                 content: '',
@@ -142,16 +142,14 @@ export default {
         "myHeader":head
     },
     mounted: function() {
+        this.infoParam.itvId = this.$route.query.itvId;
         this.getInfo();
         this.getType();
     },
     methods: {
         selectType(index) {
             if(this.typeArray[index].typeClass === 'defaultTag') {
-                console.log(this.formerType)
-                console.log(index)
                 if(this.formerType >= 0 && this.formerType != index) {
-                    console.log(index)
                     this.typeArray[this.formerType].typeClass = 'defaultTag';
                     Vue.set(this.typeArray,this.formerType,this.typeArray[this.formerType])
                 }
@@ -278,17 +276,25 @@ export default {
                 this.formerMobile = this.mobiles.length;
                 this.infoParam.mobile = this.newMobile;
                 this.mobiles.push({number:this.newMobile, mobileClass: 'activeTag'});
+                this.warningCode = '';
+                this.warningMobile = '';
+                this.newMobile = '';
+                this.countDown = 0;
+                this.newCode = '';
+                this.currentCode = '';
             }
         },
         getCode() {
             let hasNumber = false;
             for (var i=0; i<this.mobiles.length; i++) {
-                if(mobiles[i].number === this.newMobile) {
+                if(this.mobiles[i].number === this.newMobile) {
                     hasNumber = true;
+                    this.warningMobile = '*该手机号已存在！'
                     break;
                 }
             }
             if(this.newMobile && !hasNumber) {
+                this.warningMobile = '';
                 this.setTime();
                 let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
                 axios.post(this.urlHeader + '/message/sendMsg',qs.stringify({mobile:this.newMobile,timestamp:this.infoParam.timestamp}),{
@@ -301,7 +307,7 @@ export default {
                 })
                 .catch(response=> {
                 });
-            }else {
+            }else if(!this.newMobile) {
                 this.warningMobile = '*手机号不能为空！'
             }
             

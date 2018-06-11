@@ -5,7 +5,7 @@
         <div class="adviceContent">
             <el-tabs v-model="activeName" @tab-click="handleTab">
                 <el-tab-pane v-for="item in indexArray" :key="item.id" :label="item.label">
-                    <div v-if="contentArray.length === 0" class="warningContent">暂无数据</div>
+                    <div v-if="contentArray.length === 0" class="warningContent">{{loadingText}}</div>
                     <div class="box-content">
                         <el-card v-for="item in contentArray" :key="item.id" class="box-card">
                             <div class="itemIndex">
@@ -67,7 +67,7 @@ export default {
             title:'建议列表',
             activeName: '',
             listParam: {
-                itvId: 'zuoying9241',
+                itvId: '',
                 typeId: '',
                 timestamp: new Date().getTime()
             },
@@ -91,25 +91,32 @@ export default {
             ],
             contentArray: [],
             isCollapsed: false,
-            urlHeader: 'interactive'
+            urlHeader: 'interactive',
+            loadingText: '数据加载中...'
         }
     },
     components:{
         "myHeader":head
     },
     mounted: function() {
+        this.listParam.itvId = this.$route.query.itvId;
         this.getListData();
     },
     methods: {
         getListData() {
+            this.loadingText = '数据加载中...';
             let timestamp = Encrypt.encryptStr('timestamp=' + this.listParam.timestamp);
             axios.get(this.urlHeader + '/proposal/getProposalList',{params:this.listParam,headers:{
                 "Authorization": timestamp
             }})
             .then(response=> {
                 let result = response.data.data;
-                for(let i=0; i<result.length; i++) {
-                    result[i].isCollapsed = false;
+                if (result.length > 0) {
+                    for(let i=0; i<result.length; i++) {
+                        result[i].isCollapsed = false;
+                    }
+                }else {
+                    this.loadingText = '暂无数据';
                 }
                 this.contentArray = result;
             })
