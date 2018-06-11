@@ -5,7 +5,7 @@
         <div class="adviceContent">
             <el-tabs v-model="activeName" @tab-click="handleTab">
                 <el-tab-pane v-for="item in indexArray" :key="item.id" :label="item.label">
-                    <div v-if="contentArray.length === 0" class="warningContent">{{loadingText}}</div>
+                    <div v-if="loadingText" class="warningContent">{{loadingText}}</div>
                     <div class="box-content">
                         <el-card v-for="item in contentArray" :key="item.id" class="box-card">
                             <div class="itemIndex">
@@ -60,6 +60,7 @@ import head from '../components/header.vue'
 import Encrypt from '../assets/js/encrypt'
 import axios from 'axios'
 import qs from 'qs'
+import Loading from 'element-ui'
 export default {
     name: 'app',
     data(){
@@ -92,7 +93,7 @@ export default {
             contentArray: [],
             isCollapsed: false,
             urlHeader: 'interactive',
-            loadingText: '数据加载中...'
+            loadingText: ''
         }
     },
     components:{
@@ -104,23 +105,40 @@ export default {
     },
     methods: {
         getListData() {
-            this.loadingText = '数据加载中...';
+            this.loadingText = '';
+            const loading = this.$loading({
+                lock: true,
+                text: 'Loading',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.7)'
+            });
             let timestamp = Encrypt.encryptStr('timestamp=' + this.listParam.timestamp);
+            
             axios.get(this.urlHeader + '/proposal/getProposalList',{params:this.listParam,headers:{
                 "Authorization": timestamp
             }})
             .then(response=> {
                 let result = response.data.data;
                 if (result.length > 0) {
+                    setTimeout(()=> {
+                        this.$loading().close();
+                    },1000)
                     for(let i=0; i<result.length; i++) {
                         result[i].isCollapsed = false;
                     }
                 }else {
-                    this.loadingText = '暂无数据';
+                    setTimeout(()=> {
+                        this.$loading().close();
+                        this.loadingText = '暂无数据';
+                    },1000)
                 }
                 this.contentArray = result;
             })
             .catch(response=> {
+                setTimeout(()=> {
+                    this.$loading().close();
+                    this.loadingText = '暂无数据';
+                },1000)
             });
         },
         handleTab(tab, event) {
