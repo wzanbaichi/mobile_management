@@ -54,7 +54,7 @@
                             </el-col>
                         </el-row>
                     </div>
-                    <span @click="dialogMobile = true">
+                    <span @click="dialogMobile = true, warningCode = '', warningMobile = '', newMobile = '', countDown = 60, newCode = '', currentCode = ''">
                         <el-tag class="defaultTag">以上号码都不是，点击添加</el-tag>
                     </span>
                 </div>
@@ -70,16 +70,15 @@
             </div>
         </div>
 
-        <el-dialog v-if="dialogMobile" :visible.sync="dialogMobile">
+        <el-dialog v-if="dialogMobile" :visible.sync="dialogMobile" @close="closeDialog">
             <el-row>
                 <el-col :span="5" class="mobileText">
                     <span>手机号：</span>
                 </el-col>
                 <el-col :span="18">
-                    <el-input placeholder="请输入手机号" v-model="newMobile" @change="changeWarning"></el-input>
+                    <el-input placeholder="请输入手机号" v-model="newMobile" @change="changeWarning" @input="limitNumber" @blur="filterNumber"></el-input>
                 </el-col>
             </el-row>
-
             <span class="pormpt">{{warningMobile}}</span>
 
             <el-row class="codeItem">
@@ -97,7 +96,7 @@
 
             <div class="buttonGroup">
                 <el-button type="primary" @click="addMobile">确定</el-button>
-                <el-button type="info" @click="dialogMobile = false, warningCode = '', warningMobile = '', newMobile = '', countDown = 0, newCode = '', currentCode = ''">取消</el-button>
+                <el-button type="info" @click="dialogMobile = false, countDown = 0">取消</el-button>
             </div>
         </el-dialog>
     </div>
@@ -109,6 +108,7 @@ import Encrypt from '../assets/js/encrypt'
 import axios from 'axios'
 import qs from 'qs'
 import Vue from 'vue'
+let mobileFilter = /^[1][3,4,5,7,8][0-9]{9}$/;
 export default {
     name: 'app',
     data(){
@@ -246,8 +246,13 @@ export default {
                     }
                 })
                 .then(response=> {
-                    if(response.data.message === '成功') {
-                        this.$router.push({path:'/AdviceSuccess'});
+                    if(response.data.code === '00001') {
+                        this.$router.push({path:'/AdviceSuccess?itvId=' + this.infoParam.itvId});
+                    }else {
+                        this.$message({
+                            message: response.data.message,
+                            type: 'warning'
+                        });
                     }
                 })
                 .catch(response=> {
@@ -256,6 +261,20 @@ export default {
         },
         changeWarning() {
             if(this.newMobile) {
+                this.warningMobile = '';
+            }
+        },
+        limitNumber(e) {
+            if(!e.match(mobileFilter) && e.length >10){
+                this.warningMobile = '*手机号码格式不正确';
+            }else {
+                this.warningMobile = '';
+            }
+        },
+        filterNumber() {
+            if(!this.newMobile.match(mobileFilter)){
+                this.warningMobile = '*手机号码格式不正确';
+            }else {
                 this.warningMobile = '';
             }
         },
@@ -328,8 +347,11 @@ export default {
                 this.setTime();
             },1000);
         },
+        closeDialog() {
+            this.countDown = 0;
+        },
         getList() {
-            this.$router.push({path:'/AdviceList'});
+            this.$router.push({path:'/AdviceList?itvId=' + this.infoParam.itvId});
         },
         handleClick(e) {
             if(this.infoParam.mobile != e.target.innerText) {

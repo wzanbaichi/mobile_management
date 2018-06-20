@@ -34,7 +34,7 @@ export default {
     methods: {
         returnInfo() {
             if(this.countDown === 0) {
-                this.$router.push({path:'/'});
+                this.$router.push({path:'/?itvId=' + this.$route.query.itvId});
                 return false;
             }else {
                 this.countDown --;
