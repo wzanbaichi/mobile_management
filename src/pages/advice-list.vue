@@ -13,7 +13,7 @@
                                     <el-col class="indexDate" :span="12"><span class="indexName">{{item.classfyName}}</span></el-col>
                                     <el-col class="indexStatus" :span="12">
                                         <span v-if="item.reply" class="backItem"><i class="iconfont icon-pinglun3-copy"></i>已回复</span>
-                                        <span v-if="!item.reply" class="applyItem"><i class="el-icon-success"></i>已提交</span>
+                                        <span v-if="!item.reply" class="applyItem"><i class="el-icon-success"></i>&nbsp;&nbsp;已提交</span>
                                     </el-col>
                                 </el-row>
                             </div>
@@ -195,6 +195,8 @@ body {
 }
 .indexName {
     line-height: 2.2;
+    font-size: 30px;
+    color: #505050;
 }
 .indexStatus {
     text-align: right;
@@ -205,18 +207,19 @@ body {
 }
 .backItem {
     color: #FFAF04;
-    font-size: 28px;
+    font-size: 30px;
     margin: 10px 0;
 }
 .applyItem {
     color: #1AA75F;
-    font-size: 28px;
+    font-size: 30px;
 }
 .indexContent {
     text-align: left;
     width: 90%;
     margin: 0 30px;
     line-height: 1.4;
+    color: #808080;
 }
 .collapseContent {
     overflow: hidden;
@@ -229,6 +232,7 @@ body {
 }
 .collapseItem {
     width: 100%;
+    padding-top: 10px;
     margin: 10px 0;
     border-top: 1px solid #DDDDDD;
 }
@@ -241,5 +245,8 @@ body {
 }
 .warningContent {
     margin-top: 150px;
+}
+.selfIcon {
+    vertical-align: middle;
 }
 </style>

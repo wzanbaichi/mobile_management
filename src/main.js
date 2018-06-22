@@ -7,6 +7,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/css/advice-info.css'
 import './assets/css/advice-list.css'
+import '../static/js/flex'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)

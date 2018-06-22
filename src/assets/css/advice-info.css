@@ -9,3 +9,21 @@
     color: #ffffff;
     background-color: #1A9DE1;
 }
+.typeIndex {
+    text-align: center;
+    width: 2.533333rem;
+}
+.mobileIndex {
+    text-align: center;
+    width: 195px;
+}
+.el-autocomplete {
+    display: inline;
+    color: #505050;
+}
+.el-autocomplete-suggestion li {
+    color: #aaaaaa;
+}
+.el-autocomplete-suggestion__list :first-child {
+    pointer-events: none;
+}
