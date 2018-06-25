@@ -4,7 +4,7 @@
         <div class="infoIndex">
             <el-row>
                 <el-col :span="8">
-                    <img class="infoImg" src="../images/tou.png">
+                    <img class="infoImg" src="../images/itv-logo.png">
                 </el-col>
                 <el-col :span="14" class="baseInfo">
                     <div>
@@ -218,7 +218,7 @@ export default {
         },
         getType() {
             let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
-            axios.get(this.urlHeader + '/proposal/getProposalTypes',{params:{timestamp:this.infoParam.timestamp},headers:{
+            axios.get(this.urlHeader + '/proposal/getProposalTypes',{params:{timestamp:this.infoParam.timestamp,itvId:this.infoParam.itvId},headers:{
                 "Authorization": timestamp
             }})
             .then(response=> {

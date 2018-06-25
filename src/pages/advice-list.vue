@@ -12,7 +12,7 @@
                                 <el-row>
                                     <el-col class="indexDate" :span="12"><span class="indexName">{{item.classfyName}}</span></el-col>
                                     <el-col class="indexStatus" :span="12">
-                                        <span v-if="item.reply" class="backItem"><i class="iconfont icon-pinglun3-copy"></i>已回复</span>
+                                        <span v-if="item.reply" class="backItem"><i class="iconfont icon-pinglun3-copy"></i>&nbsp;&nbsp;已回复</span>
                                         <span v-if="!item.reply" class="applyItem"><i class="el-icon-success"></i>&nbsp;&nbsp;已提交</span>
                                     </el-col>
                                 </el-row>
@@ -213,6 +213,7 @@ body {
 .applyItem {
     color: #1AA75F;
     font-size: 30px;
+    margin: 10px 0;
 }
 .indexContent {
     text-align: left;
