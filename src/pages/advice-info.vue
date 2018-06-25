@@ -44,22 +44,12 @@
             <div class="infoMobile">
                 <div class="infoContent">
                     <span><i>*</i>请输入您的手机号码，以方便给您反馈</span>
-                    <div @click="dialogMobile = true, warningCode = '', warningMobile = '', newMobile = '', countDown = 60, newCode = '', currentCode = '', mobileList = [], isDisabled = false, codeDisabled = false">
-                        <el-tag type="info" style="width:100%;backgroundColor:#fff">{{infoParam.mobile}}</el-tag>
+                    <div @click="dialogMobile = true, warningCode = '', warningMobile = '', newMobile = '', countDown = 60, newCode = '', currentCode = '', mobileList = [], isDisabled = false">
+                        <el-tag type="info" style="width:100%;backgroundColor:#fff">{{defaultMobile}}
+
+                            <span class="editItem" v-if="isShow">修改</span>
+                        </el-tag>
                     </div>
-                    <!-- <span>您的手机号码可能是：</span>
-                    <div @click="handleClick">
-                        <el-row >
-                            <el-col v-for="(item, index) in mobiles" :key="index" :span="8">
-                                <span @click="selectMobile(index)">
-                                    <el-tag :class="item.mobileClass" class="mobileIndex">{{item.number}}</el-tag>
-                                </span>
-                            </el-col>
-                        </el-row>
-                    </div> -->
-                    <!-- <span @click="dialogMobile = true, warningCode = '', warningMobile = '', newMobile = '', countDown = 60, newCode = '', currentCode = ''">
-                        <el-tag class="defaultTag">以上号码都不是，点击添加</el-tag>
-                    </span> -->
                 </div>
             </div>
             <div class="bottomContent">
@@ -88,7 +78,6 @@
                     @input="limitNumber" 
                     @blur="filterNumber"
                     ></el-autocomplete>
-                    <!-- <el-input placeholder="请输入手机号" v-model="newMobile" @change="changeWarning" @input="limitNumber" @blur="filterNumber"></el-input> -->
                 </el-col>
             </el-row>
             <span class="pormpt">{{warningMobile}}</span>
@@ -98,7 +87,7 @@
                     <span>验证码：</span>
                 </el-col>
                 <el-col :span="9">
-                    <el-input placeholder="请输入验证码" v-model="newCode" :disabled="codeDisabled"></el-input>
+                    <el-input placeholder="请输入验证码" v-model="newCode"></el-input>
                 </el-col>
                 <el-col :span="10">
                     <el-button type="primary" @click="getCode" :disabled="isDisabled">{{codeButton}}</el-button>
@@ -130,26 +119,26 @@ export default {
             formerType: undefined,
             baseInfo: {},
             mobiles: [],
-            formerMobile: undefined,
             dialogMobile: false,
             isDisabled: false,
-            codeDisabled: false,
             codeButton: '获取验证码',
             countDown: 60,
             urlHeader: 'interactive',
             infoParam: {
                 itvId: '',
                 timestamp: new Date().getTime(),
-                mobile: '请输入或选择您的手机号码...',
+                mobile: '',
                 content: '',
                 classifyId: ''
             },
+            defaultMobile: '请输入或选择您的手机号码...',
             newMobile: '',
             newCode: '',
             currentCode: '',
             warningMobile: '',
             warningCode: '',
-            mobileList: []
+            mobileList: [],
+            isShow: false
         }
     },
     components:{
@@ -178,23 +167,6 @@ export default {
                 return;
             }
         },
-        selectMobile(index) {
-            if(this.mobiles[index].mobileClass === 'defaultTag') {
-                if(this.formerMobile >= 0 && this.formerMobile != index) {
-                    this.mobiles[this.formerMobile].mobileClass = 'defaultTag';
-                    Vue.set(this.mobiles,this.formerMobile,this.mobiles[this.formerMobile])
-                }
-                this.mobiles[index].mobileClass = 'activeTag';
-                this.formerMobile = index;
-                Vue.set(this.mobiles,index,this.mobiles[index])
-                return;
-            }
-            if(this.mobiles[index].mobileClass === 'activeTag') {
-                this.mobiles[index].mobileClass = 'defaultTag';
-                Vue.set(this.mobiles,index,this.mobiles[index])
-                return;
-            }
-        },
         getInfo() {
             let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
             axios.get(this.urlHeader + '/home/getUserInfo',{params:this.infoParam,headers:{
@@ -202,13 +174,16 @@ export default {
             }})
             .then(response=> {
                 let result = JSON.parse(response.data.data);
-                
+                if(result.realMoble) {
+                    this.defaultMobile = result.realMoble;
+                    this.infoParam.mobile = result.realMoble;
+                    this.isShow = true;
+                }
                 this.baseInfo = result;
                 for(let key in JSON.parse(result.activityPhone)) {
                     if(JSON.parse(result.activityPhone).hasOwnProperty(key)) {
                         let mobileItem = {};
                         mobileItem.number = key;
-                        mobileItem.mobileClass = 'defaultTag';
                         this.mobiles.push(mobileItem);
                     }
                 }
@@ -280,8 +255,6 @@ export default {
         },
         limitNumber(e) {
             this.mobileList = [];
-            this.isDisabled = false;
-            this.codeDisabled = false;
             for(var i=0; i<this.mobiles.length; i++) {
                 if(this.mobiles[i].number && (this.mobiles[i].number).indexOf(e) === 0) {
                     this.mobileList.push(this.mobiles[i]);
@@ -293,15 +266,6 @@ export default {
             }else {
                 this.warningMobile = '';
             }
-
-            for (var i=0; i<this.mobiles.length; i++) {
-                if(this.mobiles[i].number === this.newMobile) {
-                    this.warningMobile = '*该手机号已存在！'
-                    this.isDisabled = true;
-                    this.codeDisabled = true;
-                    break;
-                }
-            }
         },
         filterNumber() {
             if(!this.newMobile.match(mobileFilter)){
@@ -311,61 +275,40 @@ export default {
             }
         },
         addMobile() {
-            if(!this.codeDisabled) {
-                if(!this.newCode) {
-                    this.warningCode = '*验证码不能为空！'
-                }
-                if(this.newCode && this.newCode != this.currentCode) {
-                    this.warningCode = '*验证码不正确！'
-                }
-                if(this.newCode && this.newCode === this.currentCode) {
-                    this.$message({
-                        message: '手机号码验证成功',
-                        type: 'success'
-                    });
-                    this.dialogMobile = false;
-                    this.warningCode = '';
-                    if(this.formerMobile >= 0) {
-                        this.mobiles[this.formerMobile].mobileClass = 'defaultTag';
-                        Vue.set(this.mobiles,this.formerMobile,this.mobiles[this.formerMobile])
-                    }
-                    this.formerMobile = this.mobiles.length;
-                    this.infoParam.mobile = this.newMobile;
-                    this.mobiles.push({number:this.newMobile, mobileClass: 'activeTag'});
-                    this.warningCode = '';
-                    this.warningMobile = '';
-                    this.newMobile = '';
-                    this.countDown = 0;
-                    this.newCode = '';
-                    this.currentCode = '';
-                }
-            }else {
+            if(!this.newCode) {
+                this.warningCode = '*验证码不能为空！'
+            }
+            if(this.newCode && this.newCode != this.currentCode) {
+                this.warningCode = '*验证码不正确！'
+            }
+            if(this.newCode && this.newCode === this.currentCode) {
                 this.$message({
-                    message: '手机号码获取成功',
+                    message: '手机号码验证成功',
                     type: 'success'
                 });
                 this.dialogMobile = false;
                 this.warningCode = '';
                 this.infoParam.mobile = this.newMobile;
-                this.warningCode = '';
+                this.defaultMobile = this.newMobile;
+                let hasMobile = false;
+                for (var i=0; i<this.mobiles.length; i++) {
+                    if(this.mobiles[i].number === this.newMobile) {
+                        hasMobile = true;
+                        break;
+                    }
+                }
+                if(!hasMobile) {
+                    this.mobiles.push({number:this.newMobile});
+                }
                 this.warningMobile = '';
                 this.newMobile = '';
                 this.countDown = 0;
                 this.newCode = '';
                 this.currentCode = '';
             }
-            
         },
         getCode() {
-            // let hasNumber = false;
-            // for (var i=0; i<this.mobiles.length; i++) {
-            //     if(this.mobiles[i].number === this.newMobile) {
-            //         hasNumber = true;
-            //         this.warningMobile = '*该手机号已存在！'
-            //         break;
-            //     }
-            // }
-            if(this.newMobile && !this.codeDisabled) {
+            if(this.newMobile) {
                 this.warningMobile = '';
                 this.setTime();
                 let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
@@ -382,7 +325,6 @@ export default {
             }else if(!this.newMobile) {
                 this.warningMobile = '*手机号不能为空！'
             }
-            
         },
         setTime() {
             if(this.countDown === 0) {
@@ -550,6 +492,17 @@ body {
     overflow: hidden;
     color:#909399;
     text-align: left;
+}
+.editItem {
+    position: absolute;
+    text-align: center;
+    height: 60px;
+    width: 100px;
+    right: 70px;
+    color: #1A9DE1;
+    border-radius: 0.1rem;
+    border: 0.014rem solid #1A9DE1;
+    display: inline-block;
 }
 /* .typeIndex {
     text-align: center;
