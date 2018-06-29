@@ -5,8 +5,9 @@ import App from './App'
 import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import './assets/css/advice-info.css'
-import './assets/css/advice-list.css'
+import './assets/css/advice-info.less'
+import './assets/css/advice-list.less'
+import './assets/css/reset.less'
 import '../static/js/flex'
 
 Vue.config.productionTip = false

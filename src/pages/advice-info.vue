@@ -379,17 +379,17 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
 body {
     background-color: #F1F1F1;
 }
 .bottomContent {
     height: 100%;
     width: 100%;
-    background-color: #ffffff;
+    background-color: white;
 }
 .infoIndex {
-    background-color: #ffffff;
+    background-color: white;
 }
 .infoImg {
     width: 110px;
@@ -407,7 +407,7 @@ body {
     text-align: left;
     line-height: 2.8;
     font-size: 32px;
-    background-color: #ffffff;
+    background-color: white;
 }
 .textItem {
     margin-left: 70px;
@@ -423,7 +423,7 @@ body {
     margin: 10px 70px;
 }
 .infoContent span i {
-    color: #FF0000;
+    color: red;
     margin-right: 15px;
 }
 .infoMobile {
@@ -432,7 +432,7 @@ body {
 }
 .adviceArea {
     width: 100%;
-    background-color: #fff;
+    background-color: white;
 }
 .applyButton {
     text-align: center;
@@ -442,11 +442,11 @@ body {
     width: 240px;
 }
 .defaultTag {
-    color: #000000;
-    background-color: #ffffff;
+    color: black;
+    background-color: white;
 }
 .activeTag {
-    color: #ffffff;
+    color: white;
     background-color: #1A9DE1;
 }
 .selfSpan {
