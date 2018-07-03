@@ -109,6 +109,7 @@ import Encrypt from '../assets/js/encrypt'
 import axios from 'axios'
 import qs from 'qs'
 import Vue from 'vue'
+import {getUserInfo, getProposalTypes, collectProposal, sendMsg} from '../service/getData.js'
 let mobileFilter = /^[1][3,4,5,7,8][0-9]{9}$/;
 export default {
     name: 'app',
@@ -123,7 +124,6 @@ export default {
             isDisabled: false,
             codeButton: '获取验证码',
             countDown: 60,
-            urlHeader: 'interactive',
             infoParam: {
                 itvId: '',
                 timestamp: new Date().getTime(),
@@ -168,11 +168,7 @@ export default {
             }
         },
         getInfo() {
-            let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
-            axios.get(this.urlHeader + '/home/getUserInfo',{params:this.infoParam,headers:{
-                "Authorization": timestamp
-            }})
-            .then(response=> {
+            getUserInfo(this.infoParam).then((response) => {
                 let result = JSON.parse(response.data.data);
                 if(result.realMoble) {
                     this.defaultMobile = result.realMoble;
@@ -187,23 +183,19 @@ export default {
                         this.mobiles.push(mobileItem);
                     }
                 }
+            }, (err) => {
+                console.log(err)
             })
-            .catch(response=> {
-            });
         },
         getType() {
-            let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
-            axios.get(this.urlHeader + '/proposal/getProposalTypes',{params:{timestamp:this.infoParam.timestamp,itvId:this.infoParam.itvId},headers:{
-                "Authorization": timestamp
-            }})
-            .then(response=> {
+            getProposalTypes(this.infoParam).then((response) => {
                 this.typeArray = response.data.data;
                 for(let i=0; i<this.typeArray.length; i++) {
                     this.typeArray[i].typeClass = 'defaultTag'
                 }
+            }, (err) => {
+                console.log(err)
             })
-            .catch(response=> {
-            });
         },
         apply() {
             if(!this.infoParam.mobile) {
@@ -228,13 +220,7 @@ export default {
                 return false;
             }
             if(this.infoParam.mobile && this.infoParam.classifyId && this.infoParam.content) {
-                let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
-                axios.post(this.urlHeader + '/proposal/collect',qs.stringify(this.infoParam),{
-                    headers:{
-                        "Authorization": timestamp
-                    }
-                })
-                .then(response=> {
+                collectProposal(this.infoParam).then((response) => {
                     if(response.data.code === '00001') {
                         this.$router.push({path:'/AdviceSuccess?itvId=' + this.infoParam.itvId});
                     }else {
@@ -243,9 +229,9 @@ export default {
                             type: 'warning'
                         });
                     }
+                }, (err) => {
+                    console.log(err)
                 })
-                .catch(response=> {
-                });
             }
         },
         changeWarning() {
@@ -311,17 +297,11 @@ export default {
             if(this.newMobile) {
                 this.warningMobile = '';
                 this.setTime();
-                let timestamp = Encrypt.encryptStr('timestamp=' + this.infoParam.timestamp);
-                axios.post(this.urlHeader + '/message/sendMsg',qs.stringify({mobile:this.newMobile,timestamp:this.infoParam.timestamp}),{
-                    headers:{
-                        "Authorization": timestamp
-                    }
-                })
-                .then(response=> {
+                collectProposal(this.infoParam).then((response) => {
                     this.currentCode = response.data.data;
+                }, (err) => {
+                    console.log(err)
                 })
-                .catch(response=> {
-                });
             }else if(!this.newMobile) {
                 this.warningMobile = '*手机号不能为空！'
             }
@@ -496,7 +476,6 @@ body {
 .editItem {
     position: absolute;
     text-align: center;
-    height: 60px;
     width: 100px;
     right: 70px;
     color: #1A9DE1;
