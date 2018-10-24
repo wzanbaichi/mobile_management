@@ -146,6 +146,9 @@ export default {
     },
     mounted: function() {
         this.infoParam.itvId = this.$route.query.itvId;
+        this.baseInfo.model = this.$route.query.model;
+        this.baseInfo.mac = this.$route.query.mac;
+        this.baseInfo.itvaccount = this.$route.query.itvId;
         this.getInfo();
         this.getType();
     },
@@ -174,12 +177,11 @@ export default {
             }})
             .then(response=> {
                 let result = JSON.parse(response.data.data);
-                if(result.realMoble) {
-                    this.defaultMobile = result.realMoble;
-                    this.infoParam.mobile = result.realMoble;
+                if(result.realMobile) {
+                    this.defaultMobile = result.realMobile;
+                    this.infoParam.mobile = result.realMobile;
                     this.isShow = true;
                 }
-                this.baseInfo = result;
                 for(let key in JSON.parse(result.activityPhone)) {
                     if(JSON.parse(result.activityPhone).hasOwnProperty(key)) {
                         let mobileItem = {};

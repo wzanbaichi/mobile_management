@@ -61,6 +61,7 @@ import Encrypt from '../assets/js/encrypt'
 import axios from 'axios'
 import qs from 'qs'
 import Loading from 'element-ui'
+import {getProposalList} from '../service/getData.js'
 export default {
     name: 'app',
     data(){
@@ -92,7 +93,6 @@ export default {
             ],
             contentArray: [],
             isCollapsed: false,
-            urlHeader: 'interactive',
             loadingText: ''
         }
     },
@@ -112,12 +112,8 @@ export default {
                 spinner: 'el-icon-loading',
                 background: 'rgba(0, 0, 0, 0.7)'
             });
-            let timestamp = Encrypt.encryptStr('timestamp=' + this.listParam.timestamp);
-            
-            axios.get(this.urlHeader + '/proposal/getProposalList',{params:this.listParam,headers:{
-                "Authorization": timestamp
-            }})
-            .then(response=> {
+
+            getProposalList(this.listParam).then((response) => {
                 let result = response.data.data;
                 if (result.length > 0) {
                     setTimeout(()=> {
@@ -133,13 +129,12 @@ export default {
                     },1000)
                 }
                 this.contentArray = result;
-            })
-            .catch(response=> {
+            }, (err) => {
                 setTimeout(()=> {
                     this.$loading().close();
                     this.loadingText = '暂无数据';
                 },1000)
-            });
+            })
         },
         handleTab(tab, event) {
             if(tab.index === '0') {
