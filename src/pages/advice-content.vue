@@ -1,8 +1,31 @@
 <template>
-    <div id="advice-info">
+    <div id="advice-content">
         <myHeader :title="title"></myHeader>
+        <div class="infoTitle">
+            <span>请选择你想反馈的问题点（必选）</span>
+        </div>
         <div class="infoIndex">
-            <el-row>
+            <div class="infoItem">
+                <div v-for="(item,index) in typeArray" :key="index">
+                    <div class="infoCotent">
+                        <el-radio v-model="radio" :label="item.id">{{item.name}}</el-radio>
+                    </div>
+                    <div class="bottomLine"></div>
+                </div>
+                
+                <!-- <div class="infoCotent">
+                    <el-radio v-model="radio" label="2">功能类：播放无声音、黑屏、无记忆播放功能等</el-radio>
+                </div>
+                <div class="bottomLine"></div>
+                <div class="infoCotent">
+                    <el-radio v-model="radio" label="3">网络类：播放卡顿等</el-radio>
+                </div>
+                <div class="bottomLine"></div>
+                <div class="infoCotent">
+                    <el-radio v-model="radio" label="4">其他问题</el-radio>
+                </div> -->
+            </div>
+            <!-- <el-row>
                 <el-col :span="8">
                     <img class="infoImg" src="../images/itv-logo.png">
                 </el-col>
@@ -20,16 +43,29 @@
                         <span>{{model}}</span>
                     </div>
                 </el-col>
-            </el-row>
+            </el-row> -->
         </div>
 
-        <div class="infoText" @click="getList">
+        <div class="infoTitle">
+            <span>请补充详细问题和意见</span>
+        </div>
+        <div class="infoArea">
+            <textarea v-on:input="changeText" v-model="infoText" placeholder="请在此输入详细问题" rows="5"></textarea>
+            <div class="limitText">{{limitText}}</div>
+        </div>
+        
+
+        <!-- <div class="infoText" @click="getList">
             <span class="textItem"><i class="iconfont icon-xiaoxi selfMessage"></i>&nbsp;&nbsp;&nbsp;以往建议</span>
             <i class="iconfont icon-iconfontyoujiantou selfjiantou"></i>
-        </div>
+        </div> -->
 
         <div class="infoText">
-            <div class="infoContent">
+            <div class="infoTitle">
+                <span>请输入或选择您的手机号码<i>*</i></span>
+            </div>
+            
+            <!-- <div class="infoContent">
                 <span><i>*</i>您为我们提供一下哪些建议呢？</span>
                 <div @click="handleType">
                     <el-row>
@@ -40,10 +76,10 @@
                         </el-col>
                     </el-row>
                 </div>
-            </div>
+            </div> -->
             <div class="infoMobile">
                 <div class="infoContent">
-                    <span><i>*</i>请输入您的手机号码，以方便给您反馈</span>
+                    
                     <div @click="dialogMobile = true, warningCode = '', warningMobile = '', newMobile = '', countDown = 60, newCode = '', currentCode = '', mobileList = [], isDisabled = false">
                         <el-tag type="info" style="width:100%;backgroundColor:#fff">{{defaultMobile}}
 
@@ -52,7 +88,7 @@
                     </div>
                 </div>
             </div>
-            <div class="bottomContent">
+            <!-- <div class="bottomContent">
                 <div class="infoContent">
                 <span><i>*</i>请留下您的宝贵建议</span>
                 <textarea v-model="infoParam.content" rows="6" class="adviceArea"></textarea>
@@ -60,7 +96,11 @@
                 <div  class="applyButton">
                     <el-button type="primary" @click="apply">提交</el-button>
                 </div>
-            </div>
+            </div> -->
+        </div>
+
+        <div  class="applyButton">
+            <el-button type="primary" @click="apply">提交</el-button>
         </div>
 
         <el-dialog v-if="dialogMobile" :visible.sync="dialogMobile" @close="closeDialog">
@@ -68,9 +108,8 @@
                 <el-col :span="5" class="mobileText">
                     <span>手机号：</span>
                 </el-col>
-                <el-col :span="18" type="text-align:left">
+                <el-col :span="19" type="text-align:left">
                     <el-autocomplete
-                    type="tel"
                     class="inline-input"
                     v-model="newMobile"
                     :fetch-suggestions="querySearch"
@@ -87,10 +126,10 @@
                 <el-col :span="5" class="mobileText">
                     <span>验证码：</span>
                 </el-col>
-                <el-col :span="9">
+                <el-col :span="10">
                     <el-input placeholder="请输入验证码" v-model="newCode"></el-input>
                 </el-col>
-                <el-col :span="10">
+                <el-col :span="8">
                     <el-button class="codeButton" type="primary" @click="getCode" :disabled="isDisabled">{{codeButton}}</el-button>
                 </el-col>
             </el-row>
@@ -111,12 +150,12 @@ import axios from 'axios'
 import qs from 'qs'
 import Vue from 'vue'
 import {getUserInfo, getProposalTypes, collectProposal, sendMsg} from '../service/getData.js'
-var mobileFilter = /^[1][3,4,5,7,8,9][0-9]{9}$/;
+let mobileFilter = /^[1][3,4,5,7,8,9][0-9]{9}$/;
 export default {
     name: 'app',
     data(){
         return {
-            title: '优化建议',
+            title: '我要吐槽',
             typeArray: [],
             formerType: undefined,
             itvaccount: '',
@@ -128,7 +167,7 @@ export default {
             codeButton: '获取验证码',
             countDown: 60,
             infoParam: {
-                itvId: '',
+                itvId: 'zuoying9241',
                 timestamp: new Date().getTime(),
                 mobile: '',
                 content: '',
@@ -141,7 +180,14 @@ export default {
             warningMobile: '',
             warningCode: '',
             mobileList: [],
-            isShow: false
+            isShow: false,
+            radio: '',
+            infoText: '',
+            limitText: '0/75',
+            stbVersion: '',
+            programCode: '',
+            programName: '',
+            programGenre: ''
         }
     },
     components:{
@@ -150,11 +196,19 @@ export default {
     mounted: function() {
         var currentUrl = window.location.href;
         if(currentUrl.indexOf("?") > 0) {
-            var tempArray = currentUrl.split("?")[1].split("&");
-            this.infoParam.itvId = tempArray[0].split("=")[1];
-            this.model = tempArray[1].split("=")[1];
-            this.mac = tempArray[2].split("=")[1];
-            this.itvaccount = tempArray[0].split("=")[1];
+            if(currentUrl.split("?")[1].indexOf("&") > 0) {
+                let tempArray = currentUrl.split("?")[1].split("&");
+                let obj = {};
+                for(let i=0; i<tempArray.length; i++) {
+                    var subArr = tempArray[i].split('=');
+                    obj[subArr[0]] = subArr[1];
+                }
+                this.infoParam.itvId = obj.itvId;
+                this.stbVersion = obj.stbVersion;
+                this.programCode = obj.programCode;
+                this.programName = decodeURI(obj.programName);
+                this.programGenre = decodeURI(obj.programGenre);
+            }
         }
         
         this.getInfo();
@@ -187,14 +241,18 @@ export default {
                     this.isShow = true;
                 }
                 
-                // this.baseInfo = result;
-                for(let key in JSON.parse(result.activityPhone)) {
-                    if(JSON.parse(result.activityPhone).hasOwnProperty(key)) {
-                        let mobileItem = {};
-                        mobileItem.number = key;
-                        this.mobiles.push(mobileItem);
+                if(result.activityPhone) {
+                    for(let key in JSON.parse(result.activityPhone)) {
+                        if(JSON.parse(result.activityPhone).hasOwnProperty(key)) {
+                            let mobileItem = {};
+                            mobileItem.number = key;
+                            this.mobiles.push(mobileItem);
+                        }
                     }
+                }else {
+                    this.mobiles = [];
                 }
+                
             }, (err) => {
                 console.log(err)
             })
@@ -210,41 +268,52 @@ export default {
             })
         },
         apply() {
+            let applyParam = {};
+            if(!this.radio) {
+                this.$message({
+                    message: '警告，反馈的问题不能为空!',
+                    type: 'warning'
+                });
+                return false;
+            }else {
+                applyParam.classifyId = Number(this.radio);
+            }
+            // if(!this.infoText) {
+            //     this.$message({
+            //         message: '警告，建议内容不能为空!',
+            //         type: 'warning'
+            //     });
+            //     return false;
+            // }else {
+            //     applyParam.content = this.infoText;
+            // }
+            applyParam.content = this.infoText;
             if(!this.infoParam.mobile) {
                 this.$message({
                     message: '警告，手机号不能为空!',
                     type: 'warning'
                 });
                 return false;
+            }else {
+                applyParam.mobile = this.infoParam.mobile;
             }
-            if(!this.infoParam.classifyId) {
-                this.$message({
-                    message: '警告，分类不能为空!',
-                    type: 'warning'
-                });
-                return false;
-            }
-            if(!this.infoParam.content) {
-                this.$message({
-                    message: '警告，建议内容不能为空!',
-                    type: 'warning'
-                });
-                return false;
-            }
-            if(this.infoParam.mobile && this.infoParam.classifyId && this.infoParam.content) {
-                collectProposal(this.infoParam).then((response) => {
-                    if(response.data.code === '00001') {
-                        this.$router.push({path:'/AdviceSuccess?itvId=' + this.infoParam.itvId});
-                    }else {
-                        this.$message({
-                            message: response.data.message,
-                            type: 'warning'
-                        });
-                    }
-                }, (err) => {
-                    console.log(err)
-                })
-            }
+            applyParam.itvId = this.infoParam.itvId;
+            applyParam.stbVersion = this.stbVersion;
+            applyParam.programCode = this.programCode;
+            applyParam.programName = this.programName;
+            applyParam.programGenre = this.programGenre;
+            collectProposal(applyParam).then((response) => {
+                if(response.data.code === '00001') {
+                    this.$router.push({path:'/AdviceSuccess?itvId=' + this.infoParam.itvId + '&stbVersion=' + this.stbVersion + '&programCode=' + this.programCode + '&programName=' + this.programName + '&programGenre=' + this.programGenre});
+                }else {
+                    this.$message({
+                        message: response.data.message,
+                        type: 'warning'
+                    });
+                }
+            }, (err) => {
+                console.log(err)
+            })
         },
         changeWarning() {
             if(this.newMobile) {
@@ -259,8 +328,8 @@ export default {
                 }
             }
             this.mobileList.unshift({value:"你可能的手机号是："})
-            if(!e.match(mobileFilter)){
-                this.warningMobile = '*请输入正确格式的手机号';
+            if(!e.match(mobileFilter) && e.length >10){
+                this.warningMobile = '*手机号码格式不正确';
             }else {
                 this.warningMobile = '';
             }
@@ -375,6 +444,13 @@ export default {
                 results.unshift({value:"你可能的手机号是："});
                 cb(results);
             }
+        },
+        changeText() {
+            if(this.infoText.length > 75) {
+                this.infoText = this.infoText.substring(0,75);
+            }else {
+                this.limitText = this.infoText.length + '/75';
+            }
         }
     }
 }
@@ -404,10 +480,10 @@ body {
     line-height: 1.6;
 }
 .infoText {
-    margin-top: 30px;
+    // margin-top: 40px;
     text-align: left;
     line-height: 2.8;
-    font-size: 32px;
+    font-size: 30px;
     background-color: white;
 }
 .textItem {
@@ -421,9 +497,11 @@ body {
     margin-right: 30px;
 }
 .infoContent {
-    margin: 10px 70px;
+    margin: 20px 70px;
+    margin-left: 30px;
+    margin-bottom: 40px;
 }
-.infoContent span i {
+.infoTitle span i {
     color: red;
     margin-right: 15px;
 }
@@ -437,10 +515,10 @@ body {
 }
 .applyButton {
     text-align: center;
-    margin-bottom: 195px;
-}
-.applyButton button {
-    width: 240px;
+    margin-top: 70px;
+    button {
+        width: 240px;
+    }
 }
 .defaultTag {
     color: black;
@@ -466,6 +544,7 @@ body {
     line-height: 2.5;
 }
 .buttonGroup {
+    text-align: center; 
     margin-top: 40px;
 }
 .buttonGroup button {
@@ -491,7 +570,7 @@ body {
     font-size: 12px;
     line-height: 20px;
     overflow: hidden;
-    color:#909399;
+    color: red;
     text-align: left;
 }
 .editItem {
@@ -503,6 +582,46 @@ body {
     border-radius: 0.1rem;
     border: 0.014rem solid #1A9DE1;
     display: inline-block;
+}
+
+.infoTitle {
+    height: 80px;
+    background-color: #f1f1f1;
+    color: #9b9b9b;
+    font-size: 28px;
+    line-height: 80px;
+    span {
+        margin-left: 30px;
+    }
+}
+
+.infoItem {
+    font-size: 30px;
+    line-height: 100px;
+    .infoCotent {
+        margin-left: 35px;
+    }
+    .bottomLine {
+        border: 1px solid #dddddd;
+        margin-left: 30px;
+    }
+}
+
+.infoArea {
+    background-color: white;
+    textarea {
+        margin-top: 30px;
+        margin-left: 30px;
+        width: 94%;
+        border: none;
+    }
+}
+
+.limitText {
+    text-align: right;
+    margin-right: 30px;
+    font-size: 28px;
+    color: #9b9b9b;
 }
 
 .codeButton {

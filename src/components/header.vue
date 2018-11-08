@@ -28,6 +28,7 @@ body {
     height: 120px;
     width: 100%;
     background: #1A9DE1;
+    text-align: center;
 }
 .head span { 
     display: inline-block;

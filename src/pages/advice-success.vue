@@ -6,7 +6,8 @@
                 <span class="iconfont icon-yanzhengchenggong imgIcon"></span>
             </div>
             <div>
-                <h3>感谢您对安徽电信的支持！</h3>
+                <h3>感谢您的反馈，我们将尽快处理，</h3>
+                <h3>处理结果可至“超清iTV（电视端）-我的-吐槽反馈”查询。</h3>
                 <span>{{message}}</span>
             </div>
         </div>
@@ -34,7 +35,7 @@ export default {
     methods: {
         returnInfo() {
             if(this.countDown === 0) {
-                this.$router.push({path:'/?itvId=' + this.$route.query.itvId});
+                this.$router.push({path:'/?itvId=' + this.$route.query.itvId + '&stbVersion=' + this.$route.query.stbVersion + '&programCode=' + this.$route.query.programCode + '&programName=' + this.$route.query.programName + '&programGenre=' + this.$route.query.programGenre});
                 return false;
             }else {
                 this.countDown --;
@@ -51,6 +52,9 @@ body {
     background-color: #F1F1F1;
 }
 <style>
+#advice-success {
+    text-align: center;
+}
 .successContent {
     margin-top: 180px;
 }

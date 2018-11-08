@@ -3,7 +3,8 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-const devIp = 'http://192.168.2.102:8080'
+const devIp = 'http://192.168.2.102:8090'
+const wIp = 'http://192.168.2.17:8080'
 module.exports = {
   dev: {
 
@@ -12,15 +13,15 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/home': {
-        target: devIp,
+        target: wIp,
         changeOrigin: true
       },
       '/proposal': {
-        target: devIp,
+        target: wIp,
         changeOrigin: true
       },
       '/message': {
-        target: devIp,
+        target: wIp,
         changeOrigin: true
       }
     },
@@ -51,10 +52,10 @@ module.exports = {
 
   build: {
     // Template for index.html
-    index: path.resolve(__dirname, '../dist/index.html'),
+    index: path.resolve(__dirname, '../platform/index.html'),
 
     // Paths
-    assetsRoot: path.resolve(__dirname, '../dist'),
+    assetsRoot: path.resolve(__dirname, '../platform'),
     assetsSubDirectory: 'static',
     assetsPublicPath: './',
 
